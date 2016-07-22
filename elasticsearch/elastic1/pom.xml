@@ -17,8 +17,8 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>MetaModel-elasticsearch-native</artifactId>
-	<name>MetaModel module for ElasticSearch via native (Node or Transport) client</name>
+	<artifactId>MetaModel-elasticsearch-elastic1</artifactId>
+	<name>MetaModel module for ElasticSearch via native (Node or Transport) client 1.X</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.metamodel</groupId>

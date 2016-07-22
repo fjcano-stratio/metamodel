@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.metamodel.elasticsearch.nativeclient;
+package org.apache.metamodel.elasticsearch.elastic1;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 import static org.junit.Assert.assertEquals;
@@ -47,7 +47,7 @@ import org.apache.metamodel.data.Row;
 import org.apache.metamodel.delete.DeleteFrom;
 import org.apache.metamodel.drop.DropTable;
 import org.apache.metamodel.elasticsearch.common.ElasticSearchUtils;
-import org.apache.metamodel.elasticsearch.nativeclient.utils.EmbeddedElasticsearchServer;
+import org.apache.metamodel.elasticsearch.elastic1.utils.EmbeddedElasticsearchServer;
 import org.apache.metamodel.query.FunctionType;
 import org.apache.metamodel.query.Query;
 import org.apache.metamodel.query.SelectItem;

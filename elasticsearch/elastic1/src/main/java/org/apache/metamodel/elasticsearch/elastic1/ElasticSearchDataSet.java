@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.metamodel.elasticsearch.nativeclient;
+package org.apache.metamodel.elasticsearch.elastic1;
 
 import java.util.List;
 import java.util.Map;
