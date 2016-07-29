@@ -16,33 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.metamodel.elasticsearch.elastic1;
+package org.apache.metamodel.elasticsearch.elastic1.rest;
 
 import java.util.List;
 
 import org.apache.metamodel.MetaModelException;
 import org.apache.metamodel.delete.AbstractRowDeletionBuilder;
 import org.apache.metamodel.delete.RowDeletionBuilder;
+import org.apache.metamodel.elasticsearch.elastic1.ElasticSearchUtils;
 import org.apache.metamodel.query.FilterItem;
 import org.apache.metamodel.query.LogicalOperator;
 import org.apache.metamodel.schema.Table;
-import org.elasticsearch.action.deletebyquery.DeleteByQueryRequestBuilder;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+
+import io.searchbox.core.DeleteByQuery;
 
 /**
  * {@link RowDeletionBuilder} implementation for
- * {@link ElasticSearchDataContext}.
+ * {@link ElasticSearchRestDataContext}.
  */
-final class ElasticSearchDeleteBuilder extends AbstractRowDeletionBuilder {
+final class JestElasticSearchDeleteBuilder extends AbstractRowDeletionBuilder {
+    private final JestElasticSearchUpdateCallback _updateCallback;
 
-    private static final Logger logger = LoggerFactory.getLogger(ElasticSearchDeleteBuilder.class);
-
-    private final ElasticSearchUpdateCallback _updateCallback;
-
-    public ElasticSearchDeleteBuilder(ElasticSearchUpdateCallback updateCallback, Table table) {
+    public JestElasticSearchDeleteBuilder(JestElasticSearchUpdateCallback updateCallback, Table table) {
         super(table);
         _updateCallback = updateCallback;
     }
@@ -52,13 +49,8 @@ final class ElasticSearchDeleteBuilder extends AbstractRowDeletionBuilder {
         final Table table = getTable();
         final String documentType = table.getName();
 
-        final ElasticSearchDataContext dataContext = _updateCallback.getDataContext();
-        final Client client = dataContext.getElasticSearchClient();
+        final ElasticSearchRestDataContext dataContext = _updateCallback.getDataContext();
         final String indexName = dataContext.getIndexName();
-
-        final DeleteByQueryRequestBuilder deleteByQueryRequestBuilder = new DeleteByQueryRequestBuilder(client);
-        deleteByQueryRequestBuilder.setIndices(indexName);
-        deleteByQueryRequestBuilder.setTypes(documentType);
 
         final List<FilterItem> whereItems = getWhereItems();
 
@@ -73,9 +65,13 @@ final class ElasticSearchDeleteBuilder extends AbstractRowDeletionBuilder {
             throw new UnsupportedOperationException("Could not push down WHERE items to delete by query request: "
                     + whereItems);
         }
-        deleteByQueryRequestBuilder.setQuery(queryBuilder);
-        deleteByQueryRequestBuilder.execute().actionGet();
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(queryBuilder);
 
-        logger.debug("Deleted documents by query.");
+        final DeleteByQuery deleteByQuery =
+                new DeleteByQuery.Builder(searchSourceBuilder.toString()).addIndex(indexName).addType(
+                        documentType).build();
+
+        _updateCallback.execute(deleteByQuery);
     }
 }

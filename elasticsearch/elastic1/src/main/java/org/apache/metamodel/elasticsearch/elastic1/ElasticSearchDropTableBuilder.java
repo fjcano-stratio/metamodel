@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -72,7 +72,7 @@ final class ElasticSearchDropTableBuilder extends AbstractTableDropBuilder {
      * Invokes the {@link DeleteMappingRequestBuilder#setType(String...)} method
      * using reflection. This is done because the API of ElasticSearch was
      * changed and the method signature differes between different versions.
-     * 
+     *
      * @param requestBuilder
      * @param documentType
      */
@@ -82,7 +82,7 @@ final class ElasticSearchDropTableBuilder extends AbstractTableDropBuilder {
         try {
             try {
                 method = requestBuilder.getClass().getDeclaredMethod("setType", String[].class);
-                argument = new String[] {documentType};
+                argument = new String[] { documentType };
             } catch (NoSuchMethodException e) {
                 logger.debug("No setType(String[]) method found, trying with a single String instead", e);
                 method = requestBuilder.getClass().getDeclaredMethod("setType", String.class);

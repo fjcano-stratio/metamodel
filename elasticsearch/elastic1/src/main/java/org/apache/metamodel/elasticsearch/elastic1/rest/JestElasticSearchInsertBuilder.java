@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.metamodel.elasticsearch.elastic1;
+package org.apache.metamodel.elasticsearch.elastic1.rest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,53 +26,49 @@ import org.apache.metamodel.elasticsearch.common.ElasticSearchCommonUtils;
 import org.apache.metamodel.insert.AbstractRowInsertionBuilder;
 import org.apache.metamodel.schema.Column;
 import org.apache.metamodel.schema.Table;
-import org.elasticsearch.action.index.IndexRequestBuilder;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.client.Client;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-final class ElasticSearchInsertBuilder extends AbstractRowInsertionBuilder<ElasticSearchUpdateCallback> {
+import io.searchbox.core.Index;
+import io.searchbox.params.Parameters;
 
-    private static final Logger logger = LoggerFactory.getLogger(ElasticSearchInsertBuilder.class);
+final class JestElasticSearchInsertBuilder extends AbstractRowInsertionBuilder<JestElasticSearchUpdateCallback> {
 
-    public ElasticSearchInsertBuilder(ElasticSearchUpdateCallback updateCallback, Table table) {
+    public JestElasticSearchInsertBuilder(JestElasticSearchUpdateCallback updateCallback, Table table) {
         super(updateCallback, table);
     }
 
     @Override
     public void execute() throws MetaModelException {
-        final ElasticSearchDataContext dataContext = getUpdateCallback().getDataContext();
-        final Client client = dataContext.getElasticSearchClient();
+        final JestElasticSearchUpdateCallback updateCallback = getUpdateCallback();
+        final ElasticSearchRestDataContext dataContext = updateCallback.getDataContext();
         final String indexName = dataContext.getIndexName();
         final String documentType = getTable().getName();
-        final IndexRequestBuilder requestBuilder = new IndexRequestBuilder(client, indexName).setType(documentType);
 
-        final Map<String, Object> valueMap = new HashMap<>();
+        final Map<String, Object> source = new HashMap<>();
         final Column[] columns = getColumns();
         final Object[] values = getValues();
+        String id = null;
         for (int i = 0; i < columns.length; i++) {
             if (isSet(columns[i])) {
-                final String name = columns[i].getName();
+                final String columnName = columns[i].getName();
+
                 final Object value = values[i];
-                if (ElasticSearchCommonUtils.FIELD_ID.equals(name)) {
+                if (ElasticSearchRestDataContext.FIELD_ID.equals(columnName)) {
                     if (value != null) {
-                        requestBuilder.setId(value.toString());
+                        id = value.toString();
                     }
                 } else {
-                    valueMap.put(name, value);
+                    final String fieldName = ElasticSearchCommonUtils.getValidatedFieldName(columnName);
+                    source.put(fieldName, value);
                 }
             }
         }
 
-        assert !valueMap.isEmpty();
+        assert !source.isEmpty();
 
-        requestBuilder.setSource(valueMap);
-        requestBuilder.setCreate(true);
+        final Index index = new Index.Builder(source).index(indexName).type(documentType).id(id).setParameter(
+                Parameters.OP_TYPE, "create").build();
 
-        final IndexResponse result = requestBuilder.execute().actionGet();
-
-        logger.debug("Inserted document: id={}", result.getId());
+        getUpdateCallback().execute(index);
     }
 
 }

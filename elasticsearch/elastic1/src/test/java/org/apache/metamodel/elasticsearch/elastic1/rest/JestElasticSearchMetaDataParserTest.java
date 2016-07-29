@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.metamodel.elasticsearch.elastic1;
+package org.apache.metamodel.elasticsearch.elastic1.rest;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,9 +25,12 @@ import org.apache.metamodel.elasticsearch.common.ElasticSearchMetaData;
 import org.apache.metamodel.schema.ColumnType;
 import org.elasticsearch.common.collect.MapBuilder;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import junit.framework.TestCase;
 
-public class ElasticSearchMetaDataParserTest extends TestCase {
+public class JestElasticSearchMetaDataParserTest extends TestCase {
 
     public void testParseMetadataInfo() throws Exception {
         Map<String, Object> metadata = new LinkedHashMap<>();
@@ -40,8 +43,9 @@ public class ElasticSearchMetaDataParserTest extends TestCase {
         metadata.put("critical", MapBuilder.newMapBuilder().put("type", "boolean").immutableMap());
         metadata.put("income", MapBuilder.newMapBuilder().put("type", "double").immutableMap());
         metadata.put("untypedthingie", MapBuilder.newMapBuilder().put("foo", "bar").immutableMap());
-
-        ElasticSearchMetaData metaData = ElasticSearchMetaDataParser.parse(metadata);
+        final Gson gson = new Gson();
+        ElasticSearchMetaData metaData = JestElasticSearchMetaDataParser
+                .parse((JsonObject) gson.toJsonTree(metadata));
         String[] columnNames = metaData.getColumnNames();
         ColumnType[] columnTypes = metaData.getColumnTypes();
 

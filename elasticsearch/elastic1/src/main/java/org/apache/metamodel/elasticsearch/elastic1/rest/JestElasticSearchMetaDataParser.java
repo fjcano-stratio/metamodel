@@ -16,40 +16,43 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.metamodel.elasticsearch.elastic1;
+package org.apache.metamodel.elasticsearch.elastic1.rest;
 
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.metamodel.elasticsearch.common.ElasticSearchCommonUtils;
 import org.apache.metamodel.elasticsearch.common.ElasticSearchMetaData;
 import org.apache.metamodel.schema.ColumnType;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 /**
  * Parser that transforms the ElasticSearch metadata response (json-like format)
  * into an ElasticSearchMetaData object.
  */
-public class ElasticSearchMetaDataParser {
+final class JestElasticSearchMetaDataParser {
 
     /**
      * Parses the ElasticSearch meta data info into an ElasticSearchMetaData
      * object. This method makes much easier to create the ElasticSearch schema.
      *
-     * @param metaDataInfo ElasticSearch mapping metadata in Map format
+     * @param metaDataInfo
+     *            ElasticSearch mapping metadata in Map format
      * @return An ElasticSearchMetaData object
      */
-    public static ElasticSearchMetaData parse(Map<String, ?> metaDataInfo) {
-        final String[] fieldNames = new String[metaDataInfo.size() + 1];
-        final ColumnType[] columnTypes = new ColumnType[metaDataInfo.size() + 1];
+    public static ElasticSearchMetaData parse(JsonObject metaDataInfo) {
+        final int columns = metaDataInfo.entrySet().size() + 1;
+        final String[] fieldNames = new String[columns];
+        final ColumnType[] columnTypes = new ColumnType[columns];
 
         // add the document ID field (fixed)
-        fieldNames[0] = ElasticSearchCommonUtils.FIELD_ID;
+        fieldNames[0] = ElasticSearchRestDataContext.FIELD_ID;
         columnTypes[0] = ColumnType.STRING;
 
         int i = 1;
-        for (Entry<String, ?> metaDataField : metaDataInfo.entrySet()) {
-            @SuppressWarnings("unchecked")
-            final Map<String, ?> fieldMetadata = (Map<String, ?>) metaDataField.getValue();
+        for (Entry<String, JsonElement> metaDataField : metaDataInfo.entrySet()) {
+            JsonElement fieldMetadata = metaDataField.getValue();
 
             fieldNames[i] = metaDataField.getKey();
             columnTypes[i] = getColumnTypeFromMetadataField(fieldMetadata);
@@ -59,22 +62,14 @@ public class ElasticSearchMetaDataParser {
         return new ElasticSearchMetaData(fieldNames, columnTypes);
     }
 
-    private static ColumnType getColumnTypeFromMetadataField(Map<String, ?> fieldMetadata) {
-        final String metaDataFieldType = getMetaDataFieldTypeFromMetaDataField(fieldMetadata);
+    private static ColumnType getColumnTypeFromMetadataField(JsonElement fieldMetadata) {
+        final JsonElement typeElement = ((JsonObject) fieldMetadata).get("type");
+        if (typeElement != null) {
+            String metaDataFieldType = typeElement.getAsString();
 
-        if (metaDataFieldType == null) {
+            return ElasticSearchCommonUtils.getColumnTypeFromElasticSearchType(metaDataFieldType);
+        } else {
             return ColumnType.STRING;
         }
-
-        return ElasticSearchCommonUtils.getColumnTypeFromElasticSearchType(metaDataFieldType);
     }
-
-    private static String getMetaDataFieldTypeFromMetaDataField(Map<String, ?> metaDataField) {
-        final Object type = metaDataField.get("type");
-        if (type == null) {
-            return null;
-        }
-        return type.toString();
-    }
-
 }

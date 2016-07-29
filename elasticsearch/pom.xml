@@ -20,13 +20,9 @@
 	<packaging>pom</packaging>
 	<name>MetaModel module for Elasticsearch</name>
 
-	<properties>
-		<elasticsearch.version>1.4.4</elasticsearch.version>
-	</properties>
-
 	<modules>
 		<module>common</module>
 		<module>elastic1</module>
-		<module>rest</module>
+		<module>elastic2</module>
 	</modules>
 </project>

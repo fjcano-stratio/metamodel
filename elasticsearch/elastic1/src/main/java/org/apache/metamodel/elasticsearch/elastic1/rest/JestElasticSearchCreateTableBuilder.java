@@ -16,27 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.metamodel.elasticsearch.elastic1;
+package org.apache.metamodel.elasticsearch.elastic1.rest;
 
 import java.util.Map;
 
 import org.apache.metamodel.MetaModelException;
 import org.apache.metamodel.create.AbstractTableCreationBuilder;
+import org.apache.metamodel.elasticsearch.elastic1.ElasticSearchUtils;
 import org.apache.metamodel.schema.MutableSchema;
 import org.apache.metamodel.schema.MutableTable;
 import org.apache.metamodel.schema.Schema;
 import org.apache.metamodel.schema.Table;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
-import org.elasticsearch.client.IndicesAdminClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-final class ElasticSearchCreateTableBuilder extends AbstractTableCreationBuilder<ElasticSearchUpdateCallback> {
+import io.searchbox.indices.mapping.PutMapping;
 
-    private static final Logger logger = LoggerFactory.getLogger(ElasticSearchCreateTableBuilder.class);
+final class JestElasticSearchCreateTableBuilder extends AbstractTableCreationBuilder<JestElasticSearchUpdateCallback> {
 
-    public ElasticSearchCreateTableBuilder(ElasticSearchUpdateCallback updateCallback, Schema schema, String name) {
+    public JestElasticSearchCreateTableBuilder(JestElasticSearchUpdateCallback updateCallback, Schema schema,
+            String name) {
         super(updateCallback, schema, name);
     }
 
@@ -45,16 +42,11 @@ final class ElasticSearchCreateTableBuilder extends AbstractTableCreationBuilder
         final MutableTable table = getTable();
         final Map<String, ?> source = ElasticSearchUtils.getMappingSource(table);
 
-        final ElasticSearchDataContext dataContext = getUpdateCallback().getDataContext();
-        final IndicesAdminClient indicesAdmin = dataContext.getElasticSearchClient().admin().indices();
+        final ElasticSearchRestDataContext dataContext = getUpdateCallback().getDataContext();
         final String indexName = dataContext.getIndexName();
 
-        final PutMappingRequestBuilder requestBuilder = new PutMappingRequestBuilder(indicesAdmin).setIndices(indexName)
-                .setType(table.getName());
-        requestBuilder.setSource(source);
-        final PutMappingResponse result = requestBuilder.execute().actionGet();
-
-        logger.debug("PutMapping response: acknowledged={}", result.isAcknowledged());
+        final PutMapping putMapping = new PutMapping.Builder(indexName, table.getName(), source).build();
+        getUpdateCallback().execute(putMapping);
 
         final MutableSchema schema = (MutableSchema) getSchema();
         schema.addTable(table);

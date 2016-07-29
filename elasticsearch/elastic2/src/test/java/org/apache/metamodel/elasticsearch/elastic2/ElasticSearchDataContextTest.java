@@ -16,19 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.metamodel.elasticsearch.common;
+package org.apache.metamodel.elasticsearch.elastic2;
 
-import java.util.Date;
+public class ElasticSearchDataContextTest {
 
-import junit.framework.TestCase;
-
-public class ElasticSearchDateConverterTest extends TestCase {
-
-    public void testConvertDateOptionalTime() throws Exception {
-        String dateToConvert = "2013-01-04T15:55:51.217+01:00";
-        Date date = ElasticSearchDateConverter.tryToConvert(dateToConvert);
-
-        assertNotNull(date);
-        assertTrue(date.toString().startsWith("Fri Jan 04"));
-    }
 }

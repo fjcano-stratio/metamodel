@@ -17,6 +17,11 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
+	<properties>
+		<jest.version>2.0.2</jest.version>
+		<elasticsearch.version>1.4.4</elasticsearch.version>
+	</properties>
+
 	<artifactId>MetaModel-elasticsearch-elastic1</artifactId>
 	<name>MetaModel module for ElasticSearch via native (Node or Transport) client 1.X</name>
 	<dependencies>
@@ -37,11 +42,30 @@
 			<artifactId>commons-io</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+		</dependency>
+
 		<!-- elasticsearch -->
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
 			<artifactId>elasticsearch</artifactId>
 			<version>${elasticsearch.version}</version>
+		</dependency>
+
+		<!-- rest -->
+		<!-- Jest -->
+		<dependency>
+			<groupId>io.searchbox</groupId>
+			<artifactId>jest</artifactId>
+			<version>${jest.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- test -->

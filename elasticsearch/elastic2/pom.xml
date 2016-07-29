@@ -17,9 +17,8 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>MetaModel-elasticsearch-common</artifactId>
-	<name>MetaModel module for ElasticSearch commons</name>
-
+	<artifactId>MetaModel-elasticsearch-elastic2</artifactId>
+	<name>MetaModel module for ElasticSearch via native (Node or Transport) client 2.X</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.metamodel</groupId>
@@ -27,22 +26,36 @@
 			<version>${project.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.metamodel</groupId>
+			<artifactId>MetaModel-elasticsearch-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+
 		<!-- elasticsearch -->
 		<dependency>
 			<groupId>org.elasticsearch</groupId>
 			<artifactId>elasticsearch</artifactId>
-			<version>2.0.2</version>
+			<!--<version>2.0.2</version>-->
+			<version>1.4.4</version>
 		</dependency>
 
+		<!-- test -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>test</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
 </project>

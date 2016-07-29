@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.metamodel.elasticsearch.elastic1.utils;
+package org.apache.metamodel.elasticsearch.elastic2.utils;
 
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.client.Client;
@@ -44,8 +44,7 @@ public class EmbeddedElasticsearchServer {
 
         ImmutableSettings.Builder elasticsearchSettings = ImmutableSettings.settingsBuilder()
                 .put("http.enabled", "true")
-                .put("path.data", dataDirectory)
-                .put("http.port", 9292);
+                .put("path.data", dataDirectory);
 
         node = nodeBuilder()
                 .local(true)

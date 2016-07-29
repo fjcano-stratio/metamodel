@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -18,7 +18,13 @@
  */
 package org.apache.metamodel.elasticsearch.elastic1;
 
-import junit.framework.TestCase;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.metamodel.data.DataSetHeader;
 import org.apache.metamodel.data.Row;
 import org.apache.metamodel.data.SimpleDataSetHeader;
@@ -26,7 +32,7 @@ import org.apache.metamodel.query.SelectItem;
 import org.apache.metamodel.schema.ColumnType;
 import org.apache.metamodel.schema.MutableColumn;
 
-import java.util.*;
+import junit.framework.TestCase;
 
 public class ElasticSearchUtilsTest extends TestCase {
 
@@ -38,7 +44,7 @@ public class ElasticSearchUtilsTest extends TestCase {
         DataSetHeader header = new SimpleDataSetHeader(selectItems1);
         Map<String, Object> values = new HashMap<>();
         values.put("value1", "theValue");
-        Row row = NativeElasticSearchUtils.createRow(values, documentId, header);
+        Row row = ElasticSearchUtils.createRow(values, documentId, header);
         String primaryKeyValue = (String) row.getValue(primaryKeyItem);
 
         assertEquals(primaryKeyValue, documentId);
@@ -53,7 +59,7 @@ public class ElasticSearchUtilsTest extends TestCase {
         Map<String, Object> values = new HashMap<>();
         values.put("value1", "theValue");
         values.put("value2", "2013-01-04T15:55:51.217+01:00");
-        Row row = NativeElasticSearchUtils.createRow(values, documentId, header);
+        Row row = ElasticSearchUtils.createRow(values, documentId, header);
         Object stringValue = row.getValue(item1);
         Object dateValue = row.getValue(item2);
 
